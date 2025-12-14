@@ -1,0 +1,74 @@
+@model IEnumerable<ComicsShopMVC.Models.ComicBook>
+
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm text-center">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold text-primary">Comics Shop Admin</h1>
+        <p class="col-md-8 fs-4 mx-auto">Manage, organize the inventory efficiently, and track publishers.</p>
+        <div class="d-flex justify-content-center gap-3 mt-3">
+            <a class="btn btn-primary btn-lg px-4" asp-controller="ComicBooks" asp-action="Index"
+                id="btn-go-inventory">Manage Inventory</a>
+            <a class="btn btn-outline-info btn-lg px-4" asp-action="GradingGuide" target="_blank" id="btn-open-guide">
+                Open Grading Guide
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3 shadow-sm h-100">
+            <div class="card-header fw-bold">Total Comics</div>
+            <div class="card-body">
+                <h5 class="card-title display-4" id="stat-total-comics">@ViewBag.TotalComics</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3 shadow-sm h-100">
+            <div class="card-header fw-bold">Total Publishers</div>
+            <div class="card-body">
+                <h5 class="card-title display-4" id="stat-total-pubs">@ViewBag.TotalPublishers</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3 shadow-sm h-100">
+            <div class="card-header fw-bold text-dark">Inventory Value</div>
+            <div class="card-body text-dark">
+                <h5 class="card-title display-4" id="stat-total-value">$@ViewBag.TotalValue</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mb-3">Recently added Comics</h3>
+<table class="table border">
+    <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Publisher</th>
+            <th>Date Added</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>$@item.Price</td>
+                    <td>@item.Publisher?.Name</td>
+                    <td>@item.PublicationDate.ToShortDateString()</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center text-muted">No data available yet.</td>
+            </tr>
+        }
+    </tbody>
+</table>

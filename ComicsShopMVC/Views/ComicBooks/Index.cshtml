@@ -1,0 +1,161 @@
+@model IEnumerable<ComicsShopMVC.Models.ComicBook>
+
+@{
+    ViewData["Title"] = "Comics List";
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h2>Comics Catalogue</h2>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+            &larr; Back to Homepage
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3 bg-light p-3 rounded">
+        <form asp-action="Index" method="get" class="d-flex w-100">
+            <input type="text" name="searchString" class="form-control me-2" placeholder="Search by Title or Publisher">
+            <button type="submit" class="btn btn-outline-primary">Search</button>
+            <a asp-action="Index" class="btn btn-outline-secondary ms-2">Reset</a>
+        </form>
+    </div>
+
+    <div class="mb-3 clearfix">
+        @if (isAdmin)
+        {
+            <a asp-action="Create" class="btn btn-primary float-start">Add new Comic</a>
+            <form asp-action="DeleteAll" method="post" class="d-inline float-end"
+                  onsubmit="return confirm('WARNING: Are you sure you want to delete ALL comics? This cannot be undone.');">
+                <button type="submit" class="btn btn-danger">Delete all Comics</button>
+            </form>
+        }
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-bordered table-striped mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        @if (isAdmin)
+                        {
+                            <th>ID</th>
+                        }
+                        <th>Title</th>
+                        <th>Issue #</th>
+                        <th>Price & Stock</th>
+                        <th>Publisher</th>
+                        <th>Date</th>
+                        <th>Condition</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                @if (isAdmin)
+                                {
+                                    <td>@item.Id</td>
+                                }
+                                <td>
+                                    @item.Title
+                                    @if (item.IsRare)
+                                    {
+                                        <span class="badge bg-warning text-dark ms-1">Rare</span>
+                                    }
+                                </td>
+                                <td>@item.IssueNumber</td>
+                                <td>
+                                    @if (item.Discount > 0)
+                                    {
+                                        <div class="price-container">
+                                            <span class="text-success fw-bold">$@item.CurrentPrice</span>
+                                            <span class="badge bg-danger">sale</span>
+                                            <div class="price-tooltip">
+                                                <div>
+                                                    <span class="old-price">$@item.Price</span>
+                                                    <span class="discount-badge">-@item.Discount%</span>
+                                                </div>
+                                                <div class="savings">Sale: $@item.Savings</div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="fw-bold">$@item.Price</span>
+                                    }
+
+                                    <div class="mt-1">
+                                        @if (item.QuantityInStock > 0)
+                                        {
+                                            <span class="badge bg-info text-dark" style="font-size: 0.75rem;">
+                                                In Stock: @item.QuantityInStock
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary" style="font-size: 0.75rem;">Out of Stock</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>@item.Publisher?.Name</td>
+                                <td>@item.PublicationDate.ToShortDateString()</td>
+                                <td>@item.Condition</td>
+
+                                <td class="text-center" style="min-width: 160px;">
+                                    @if (isAdmin)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm me-1">Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Delete this comic?');">Delete</a>
+                                    }
+                                    else
+                                    {
+                                        @if (item.QuantityInStock > 0)
+                                        {
+                                            <a asp-controller="ShoppingCart" asp-action="AddToShoppingCart"
+                                               asp-route-comicId="@item.Id" class="btn btn-success btn-sm w-100">
+                                                Add to Cart
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary btn-sm w-100" disabled>Sold Out</button>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="@(isAdmin ? 8 : 7)" class="text-center text-muted py-5">
+                                <h4>No comics found matching your criteria.</h4>
+                                <p>Try searching for something else.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

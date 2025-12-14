@@ -1,0 +1,130 @@
+@model ComicsShopMVC.Models.ComicBook
+@{
+    ViewData["Title"] = "Add New Comic";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Add New Comic</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label fw-bold"></label>
+                            <input asp-for="Title" class="form-control" id="input-title" placeholder="e.g. Batman" />
+                            <span asp-validation-for="Title" class="text-danger" id="error-title"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IssueNumber" class="form-label fw-bold"></label>
+                            <input asp-for="IssueNumber" class="form-control" id="input-issue" />
+                            <span asp-validation-for="IssueNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Price" class="form-control" id="input-price" />
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="QuantityInStock" class="form-label fw-bold"></label>
+                            <input asp-for="QuantityInStock" class="form-control" min="0" />
+                            <span asp-validation-for="QuantityInStock" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="PublicationDate" class="form-label fw-bold"></label>
+                            <input asp-for="PublicationDate" class="form-control" id="input-date" />
+                            <span asp-validation-for="PublicationDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 p-3 border rounded bg-light d-flex align-items-center">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" asp-for="IsRare" id="check-rare"
+                                    style="width: 1.2em; height: 1.2em; margin-top: 0;" />
+                                <label class="form-check-label fw-bold mb-0" asp-for="IsRare">
+                                    @Html.DisplayNameFor(model => model.IsRare)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 p-3 border rounded">
+                            <label class="form-label fw-bold d-block">Condition:</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" asp-for="Condition" value="New"
+                                    id="radio-new" checked>
+                                <label class="form-check-label" for="radio-new">New</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" asp-for="Condition" value="Used"
+                                    id="radio-used">
+                                <label class="form-check-label" for="radio-used">Used</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" asp-for="Condition" value="Damaged"
+                                    id="radio-damaged">
+                                <label class="form-check-label" for="radio-damaged">Damaged</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 p-3 border rounded bg-light">
+                            <label asp-for="PublisherId" class="form-label fw-bold"></label>
+
+                            <select asp-for="PublisherId" class="form-select mb-2" asp-items="ViewBag.PublisherId"
+                                id="select-publisher">
+                                <option value="">-- Select Publisher --</option>
+                            </select>
+
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Find by ID:</span>
+                                <input type="number" id="quick-pub-id" class="form-control" placeholder="ID">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    onclick="selectPublisherById()">Select</button>
+                            </div>
+                            <span asp-validation-for="PublisherId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-success px-5" id="btn-submit">Add New Comic</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectPublisherById() {
+        var inputId = document.getElementById('quick-pub-id').value;
+        var select = document.getElementById('select-publisher');
+        if (!inputId) { alert("Please enter an ID"); return; }
+        var found = false;
+        for (var i = 0; i < select.options.length; i++) {
+            if (select.options[i].value == inputId) {
+                select.selectedIndex = i;
+                found = true;
+                break;
+            }
+        }
+        if (!found) { alert("Publisher with ID " + inputId + " not found."); }
+        else { document.getElementById('quick-pub-id').value = ''; }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

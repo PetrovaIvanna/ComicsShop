@@ -1,0 +1,147 @@
+@model ComicsShopMVC.Models.ComicBook
+@{
+    ViewData["Title"] = "Edit Comic";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="mb-0">Edit Comic Details</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label fw-bold"></label>
+                            <input asp-for="Title" class="form-control" id="edit-title" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IssueNumber" class="form-label fw-bold"></label>
+                            <input asp-for="IssueNumber" class="form-control" id="edit-issue" />
+                            <span asp-validation-for="IssueNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Price" class="form-control" id="edit-price" />
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="QuantityInStock" class="form-label fw-bold"></label>
+                            <input asp-for="QuantityInStock" class="form-control" min="0" />
+                            <span asp-validation-for="QuantityInStock" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 p-3 border border-warning rounded bg-light">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="chk-enable-discount"
+                                    onchange="toggleDiscountField()" @(Model.Discount > 0 ? "checked" : "")
+                                    style="width: 1.2em; height: 1.2em; margin-top: 0;">
+                                <label class="form-check-label fw-bold mb-0" for="chk-enable-discount">
+                                    Apply Discount?
+                                </label>
+                            </div>
+
+                            <div class="mt-2" id="discount-container"
+                                style="@(Model.Discount > 0 ? "display:block" : "display:none")">
+                                <label asp-for="Discount" class="form-label fw-bold">Discount Percentage (%)</label>
+                                <input asp-for="Discount" class="form-control" id="edit-discount" />
+                                <span asp-validation-for="Discount" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="PublicationDate" class="form-label fw-bold"></label>
+                            <input asp-for="PublicationDate" class="form-control" id="edit-date" />
+                            <span asp-validation-for="PublicationDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 p-3 border rounded bg-light d-flex align-items-center">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" asp-for="IsRare" id="edit-rare"
+                                    style="width: 1.2em; height: 1.2em; margin-top: 0;" />
+                                <label class="form-check-label fw-bold mb-0" asp-for="IsRare">
+                                    @Html.DisplayNameFor(model => model.IsRare)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 p-3 border rounded">
+                            <label class="form-label fw-bold d-block">Condition:</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" asp-for="Condition" value="New"
+                                    id="edit-cond-new" />
+                                <label class="form-check-label" for="edit-cond-new">New</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" asp-for="Condition" value="Used"
+                                    id="edit-cond-used" />
+                                <label class="form-check-label" for="edit-cond-used">Used</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" asp-for="Condition" value="Damaged"
+                                    id="edit-cond-damaged" />
+                                <label class="form-check-label" for="edit-cond-damaged">Damaged</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 p-3 border rounded bg-light">
+                            <label asp-for="PublisherId" class="form-label fw-bold"></label>
+
+                            <select asp-for="PublisherId" class="form-select mb-2" asp-items="ViewBag.PublisherId"
+                                id="select-publisher">
+                                <option value="">-- Select Publisher --</option>
+                            </select>
+
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Find by ID:</span>
+                                <input type="number" id="quick-pub-id" class="form-control" placeholder="ID">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    onclick="selectPublisherById()">Select</button>
+                            </div>
+                            <span asp-validation-for="PublisherId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                    <a asp-action="Index" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-5" id="btn-save-edit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDiscountField() {
+        var checkBox = document.getElementById("chk-enable-discount");
+        var container = document.getElementById("discount-container");
+        var input = document.getElementById("edit-discount");
+
+        if (checkBox.checked) {
+            container.style.display = "block";
+        } else {
+            container.style.display = "none";
+            input.value = "0";
+        }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

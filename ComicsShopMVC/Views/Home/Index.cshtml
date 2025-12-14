@@ -1,0 +1,15 @@
+﻿@model IEnumerable<ComicsShopMVC.Models.ComicBook>
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container mt-4">
+    @if (ViewBag.IsAdmin)
+    {
+        <partial name="_AdminHome" model="Model" />
+    }
+    else
+    {
+        <partial name="_UserHome" />
+    }
+</div>
